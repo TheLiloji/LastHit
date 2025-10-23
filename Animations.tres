@@ -1,0 +1,56 @@
+[gd_resource type="SpriteFrames" load_steps=6 format=3 uid="uid://dyv8e23ujdghg"]
+
+[ext_resource type="Texture2D" uid="uid://qf6pld5aawo5" path="res://Attack-proto.png" id="1_2o4t6"]
+[ext_resource type="Texture2D" uid="uid://cj8bt1w534diy" path="res://Dodge-proto.png" id="1_x7gd7"]
+[ext_resource type="Texture2D" uid="uid://e7p4e78g1q6t" path="res://Idle-proto.png" id="2_s30iy"]
+[ext_resource type="Texture2D" uid="uid://c83dcxgnwgov1" path="res://Idle2-proto.png" id="3_1aish"]
+[ext_resource type="Texture2D" uid="uid://cw52n74hh2qyd" path="res://Run-proto.png" id="4_1aish"]
+
+[resource]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_2o4t6")
+}],
+"loop": false,
+"name": &"attack_light_1",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_x7gd7")
+}],
+"loop": true,
+"name": &"attack_light_2",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_x7gd7")
+}],
+"loop": false,
+"name": &"dodge",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_s30iy")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_1aish")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_1aish")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_1aish")
+}],
+"loop": true,
+"name": &"run",
+"speed": 5.0
+}]

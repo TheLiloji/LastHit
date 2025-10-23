@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://qf6pld5aawo5"
-path="res://.godot/imported/Attack-proto.png-529797b47c3e4f79a39a9de64ab0c3a6.ctex"
+uid="uid://c6j4mrvglx86v"
+path="res://.godot/imported/attack_light_1.png-b40e675ea5af6c24d4924ebc4d276d08.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Attack-proto.png"
-dest_files=["res://.godot/imported/Attack-proto.png-529797b47c3e4f79a39a9de64ab0c3a6.ctex"]
+source_file="res://animations/attack_light_1.png"
+dest_files=["res://.godot/imported/attack_light_1.png-b40e675ea5af6c24d4924ebc4d276d08.ctex"]
 
 [params]
 

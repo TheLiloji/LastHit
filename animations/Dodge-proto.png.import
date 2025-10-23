@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://cj8bt1w534diy"
-path="res://.godot/imported/Dodge-proto.png-d5e7a4f7912efb19adfa3471d213ea82.ctex"
+path="res://.godot/imported/Dodge-proto.png-c8673963a19a5924c4bb93aeda9c5246.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://Dodge-proto.png"
-dest_files=["res://.godot/imported/Dodge-proto.png-d5e7a4f7912efb19adfa3471d213ea82.ctex"]
+source_file="res://animations/Dodge-proto.png"
+dest_files=["res://.godot/imported/Dodge-proto.png-c8673963a19a5924c4bb93aeda9c5246.ctex"]
 
 [params]
 

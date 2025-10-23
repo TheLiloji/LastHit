@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="AttackData" load_steps=3 format=3 uid="uid://c2qe0ox4uh7lk"]
 
-[ext_resource type="Script" uid="uid://cks8mppwssnl5" path="res://AttackData.gd" id="1_loo80"]
+[ext_resource type="Script" uid="uid://cks8mppwssnl5" path="res://scripts/AttackData.gd" id="1_loo80"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_loo80"]
 

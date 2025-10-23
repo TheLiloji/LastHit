@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://c6j4mrvglx86v"
-path="res://.godot/imported/attack_light_1.png-788331a942d32c10664f7f47eb88f092.ctex"
+uid="uid://e1d85du1ynl3"
+path="res://.godot/imported/attack_light_2.png-48374f03bf4d577eeedc3a10fc43af2f.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://attack_light_1.png"
-dest_files=["res://.godot/imported/attack_light_1.png-788331a942d32c10664f7f47eb88f092.ctex"]
+source_file="res://animations/attack_light_2.png"
+dest_files=["res://.godot/imported/attack_light_2.png-48374f03bf4d577eeedc3a10fc43af2f.ctex"]
 
 [params]
 

@@ -38,6 +38,7 @@ var queued_attack = null
 var current_attack = null
 var face_dir := Vector2.RIGHT
 
+
 func _ready():
 	stamina = stamina_max
 	hp = hp_max

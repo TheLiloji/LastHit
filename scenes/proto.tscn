@@ -1,17 +1,21 @@
-[gd_scene load_steps=20 format=3 uid="uid://dl5alr2pfebq7"]
+[gd_scene load_steps=21 format=3 uid="uid://dl5alr2pfebq7"]
 
-[ext_resource type="Script" uid="uid://c464aamasdpu" path="res://Player.gd" id="1_fl4k8"]
-[ext_resource type="Resource" uid="uid://c1xba3ap1wpjm" path="res://Light1.tres" id="2_7trdo"]
-[ext_resource type="Script" uid="uid://b6ug2dug82yrp" path="res://AttackHitbox.gd" id="2_icttm"]
-[ext_resource type="Texture2D" uid="uid://c83dcxgnwgov1" path="res://Idle2-proto.png" id="3_lrm5r"]
-[ext_resource type="Texture2D" uid="uid://e7p4e78g1q6t" path="res://Idle-proto.png" id="6_w2jnn"]
-[ext_resource type="Texture2D" uid="uid://bpihvlx8hiexg" path="res://run.png" id="7_w2jnn"]
-[ext_resource type="Texture2D" uid="uid://cj8bt1w534diy" path="res://Dodge-proto.png" id="8_etn2g"]
-[ext_resource type="Texture2D" uid="uid://c6j4mrvglx86v" path="res://attack_light_1.png" id="8_ff4ei"]
-[ext_resource type="Texture2D" uid="uid://e1d85du1ynl3" path="res://attack_light_2.png" id="9_ff4ei"]
+[ext_resource type="Script" uid="uid://c464aamasdpu" path="res://scripts/Player.gd" id="1_3iihw"]
+[ext_resource type="Resource" uid="uid://c1xba3ap1wpjm" path="res://ressources/Light1.tres" id="2_a2wk3"]
+[ext_resource type="Texture2D" uid="uid://c6j4mrvglx86v" path="res://animations/attack_light_1.png" id="3_vt7ks"]
+[ext_resource type="Texture2D" uid="uid://e1d85du1ynl3" path="res://animations/attack_light_2.png" id="4_evfea"]
+[ext_resource type="Texture2D" uid="uid://cj8bt1w534diy" path="res://animations/Dodge-proto.png" id="5_ck2tx"]
+[ext_resource type="Texture2D" uid="uid://e7p4e78g1q6t" path="res://animations/Idle-proto.png" id="6_if71o"]
+[ext_resource type="Texture2D" uid="uid://bpihvlx8hiexg" path="res://animations/run.png" id="7_2nadv"]
+[ext_resource type="Script" uid="uid://brheg3pv24hfi" path="res://scripts/staminaBar.gd" id="8_gy6st"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_ff4ei"]
 size = Vector2(23, 35)
+
+[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_etn2g"]
+load_path = "res://.godot/imported/Idle2-proto.png-a505c6912c15c972f7f232dbeae03443.ctex"
+
+[sub_resource type="GDScript" id="GDScript_ff4ei"]
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_ff4ei"]
 radius = 27.018513
@@ -28,7 +32,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("3_lrm5r")]
+"values": [SubResource("CompressedTexture2D_etn2g")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -88,7 +92,7 @@ tracks/5/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [true]
+"values": [false]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
@@ -164,7 +168,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("8_ff4ei")]
+"values": [ExtResource("3_vt7ks")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -250,26 +254,6 @@ tracks/7/keys = {
 "update": 0,
 "values": [Vector2(-1, -4)]
 }
-tracks/8/type = "method"
-tracks/8/imported = false
-tracks/8/enabled = true
-tracks/8/path = NodePath(".")
-tracks/8/interp = 1
-tracks/8/loop_wrap = true
-tracks/8/keys = {
-"times": PackedFloat32Array(0, 0.195, 0.2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"values": [{
-"args": [],
-"method": &"_open_combo_window"
-}, {
-"args": [],
-"method": &"_close_combo_window"
-}, {
-"args": [],
-"method": &"_attack_end"
-}]
-}
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_k4unx"]
 height = 44.0
@@ -287,7 +271,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("9_ff4ei")]
+"values": [ExtResource("4_evfea")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -344,10 +328,10 @@ tracks/5/path = NodePath("Attack/Hitbox/CollisionShape2D:disabled")
 tracks/5/interp = 1
 tracks/5/loop_wrap = true
 tracks/5/keys = {
-"times": PackedFloat32Array(0, 0.03),
-"transitions": PackedFloat32Array(1, 1),
+"times": PackedFloat32Array(0, 0.03, 0.2),
+"transitions": PackedFloat32Array(1, 1, 1),
 "update": 1,
-"values": [true, false]
+"values": [true, false, true]
 }
 tracks/6/type = "value"
 tracks/6/imported = false
@@ -385,26 +369,6 @@ tracks/8/keys = {
 "update": 0,
 "values": [Vector2(0, -2.5)]
 }
-tracks/9/type = "method"
-tracks/9/imported = false
-tracks/9/enabled = true
-tracks/9/path = NodePath(".")
-tracks/9/interp = 1
-tracks/9/loop_wrap = true
-tracks/9/keys = {
-"times": PackedFloat32Array(0.033333335, 0.16666667, 0.2),
-"transitions": PackedFloat32Array(1, 1, 1),
-"values": [{
-"args": [],
-"method": &"_open_combo_window"
-}, {
-"args": [],
-"method": &"_close_combo_window"
-}, {
-"args": [],
-"method": &"_attack_end"
-}]
-}
 
 [sub_resource type="Animation" id="Animation_k4unx"]
 resource_name = "dodge"
@@ -418,7 +382,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("8_etn2g")]
+"values": [ExtResource("5_ck2tx")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -463,10 +427,10 @@ tracks/4/path = NodePath("CollisionShape2D:disabled")
 tracks/4/interp = 1
 tracks/4/loop_wrap = true
 tracks/4/keys = {
-"times": PackedFloat32Array(0),
-"transitions": PackedFloat32Array(1),
+"times": PackedFloat32Array(0, 1),
+"transitions": PackedFloat32Array(1, 1),
 "update": 1,
-"values": [true]
+"values": [true, false]
 }
 
 [sub_resource type="Animation" id="Animation_etn2g"]
@@ -483,7 +447,7 @@ tracks/0/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("6_w2jnn")]
+"values": [ExtResource("6_if71o")]
 }
 tracks/1/type = "value"
 tracks/1/imported = false
@@ -545,6 +509,18 @@ tracks/5/keys = {
 "update": 1,
 "values": [Vector2(1.16, 1.3), Vector2(1.4, 0.93)]
 }
+tracks/6/type = "value"
+tracks/6/imported = false
+tracks/6/enabled = true
+tracks/6/path = NodePath("CollisionShape2D:disabled")
+tracks/6/interp = 1
+tracks/6/loop_wrap = true
+tracks/6/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 1,
+"values": [false]
+}
 
 [sub_resource type="Animation" id="Animation_lrm5r"]
 resource_name = "run"
@@ -595,7 +571,7 @@ tracks/3/keys = {
 "times": PackedFloat32Array(0),
 "transitions": PackedFloat32Array(1),
 "update": 1,
-"values": [ExtResource("7_w2jnn")]
+"values": [ExtResource("7_2nadv")]
 }
 tracks/4/type = "value"
 tracks/4/imported = false
@@ -635,25 +611,25 @@ _data = {
 [node name="Node2D" type="Node2D"]
 
 [node name="Player" type="CharacterBody2D" parent="."]
-script = ExtResource("1_fl4k8")
-attack_light = ExtResource("2_7trdo")
+position = Vector2(597, 321)
+script = ExtResource("1_3iihw")
+attack_light = ExtResource("2_a2wk3")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
 position = Vector2(0, -2.5)
 scale = Vector2(1.16, 1.3)
 shape = SubResource("RectangleShape2D_ff4ei")
-disabled = true
 
 [node name="Sprite2D" type="Sprite2D" parent="Player"]
 position = Vector2(0, -12)
-texture = ExtResource("3_lrm5r")
+texture = SubResource("CompressedTexture2D_etn2g")
 hframes = 2
 
 [node name="Attack" type="Node2D" parent="Player"]
 
 [node name="Hitbox" type="Area2D" parent="Player/Attack"]
 collision_mask = 2
-script = ExtResource("2_icttm")
+script = SubResource("GDScript_ff4ei")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Player/Attack/Hitbox"]
 position = Vector2(-1, -4)
@@ -666,3 +642,14 @@ libraries = {
 &"": SubResource("AnimationLibrary_k4unx")
 }
 autoplay = "idle"
+
+[node name="UI" type="CanvasLayer" parent="."]
+
+[node name="ProgressBar" type="ProgressBar" parent="UI" node_paths=PackedStringArray("player")]
+offset_left = 10.0
+offset_top = 11.0
+offset_right = 313.0
+offset_bottom = 27.0
+show_percentage = false
+script = ExtResource("8_gy6st")
+player = NodePath("../../Player")

@@ -1,0 +1,81 @@
+[gd_scene load_steps=10 format=3 uid="uid://feypeb5cppj4"]
+
+[ext_resource type="Script" uid="uid://cq3mrfnjhh5bg" path="res://control.gd" id="1_5p55f"]
+[ext_resource type="Texture2D" uid="uid://21utxmxbm8jb" path="res://Titre.png" id="2_1p5nq"]
+[ext_resource type="Texture2D" uid="uid://d1olm28lcwhvm" path="res://ChatGPT Image 26 oct. 2025, 15_46_57.png" id="2_hob4j"]
+[ext_resource type="Texture2D" uid="uid://dbik6hqy0w24x" path="res://labels/FIGHT.png" id="3_hob4j"]
+[ext_resource type="Texture2D" uid="uid://dxbepj0fb3j1a" path="res://labels/CUSTOMISE.png" id="4_01bab"]
+[ext_resource type="Texture2D" uid="uid://cfrdrewdy3pt7" path="res://labels/TRAINING.png" id="5_exs80"]
+[ext_resource type="Texture2D" uid="uid://mlcb0kfav205" path="res://labels/OPTIONS.png" id="6_kql7n"]
+[ext_resource type="Texture2D" uid="uid://b2fvp13g0m0ud" path="res://labels/EXIT.png" id="7_tac8f"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_01bab"]
+texture = ExtResource("2_hob4j")
+modulate_color = Color(0.69135684, 0.6913568, 0.69135684, 1)
+
+[node name="Control" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_5p55f")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_styles/panel = SubResource("StyleBoxTexture_01bab")
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -122.00006
+offset_top = -4.5
+offset_right = 42.0
+offset_bottom = 180.5
+grow_horizontal = 2
+grow_vertical = 2
+scale = Vector2(1.5199999, 1.5199999)
+metadata/_edit_use_anchors_ = true
+
+[node name="Titre" type="Sprite2D" parent="VBoxContainer"]
+position = Vector2(83.55267, -101.64476)
+scale = Vector2(1.6842116, 1.6842116)
+texture = ExtResource("2_1p5nq")
+
+[node name="FIGHT" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+icon = ExtResource("3_hob4j")
+flat = true
+
+[node name="CUSTOMISE" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+icon = ExtResource("4_01bab")
+flat = true
+
+[node name="TRAINING" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+icon = ExtResource("5_exs80")
+flat = true
+
+[node name="OPTIONS" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+icon = ExtResource("6_kql7n")
+flat = true
+
+[node name="EXIT" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+icon = ExtResource("7_tac8f")
+flat = true
+
+[connection signal="pressed" from="VBoxContainer/FIGHT" to="." method="_on_button_pressed"]
+[connection signal="pressed" from="VBoxContainer/FIGHT" to="." method="_on_fight_pressed"]

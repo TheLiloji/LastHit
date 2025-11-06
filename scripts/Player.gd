@@ -1,8 +1,13 @@
-extends CharacterBody2D
+extends Node2D
 
 class_name Player
 
 signal staminaChanged
+
+var player: int
+var input
+
+@onready var body: CharacterBody2D = $PlayerBody
 
 # --- Déplacement ---
 @export var move_speed := 200.0
@@ -26,9 +31,15 @@ var hp
 @export var dodge_speed := 340.0
 @export var dodge_duration := 0.22
 
+# --- Distance de l'attaque ---
+@export var attack_offset := 40.0  # Distance du sprite d'attaque par rapport au joueur
+
 # --- Réfs ---
-@onready var anim: AnimationPlayer = $AnimationPlayer
-@onready var hitbox_shape: CollisionShape2D = $Attack/Hitbox/CollisionShape2D
+@onready var anim: AnimationPlayer = $PlayerBody/AnimationPlayer
+@onready var hitbox_shape: CollisionShape2D = $PlayerBody/AttackPivot/Attack/Hitbox/CollisionShape2D
+@onready var attack_pivot: Node2D = $PlayerBody/AttackPivot
+@onready var attack_sprite: Sprite2D = $PlayerBody/AttackPivot/Attack/Sprite2D  # Le sprite de l'attaque
+@onready var player_sprite: Sprite2D = $PlayerBody/Sprite2D
 
 # --- État ---
 var is_attacking := false
@@ -37,12 +48,27 @@ var invincible := false
 var queued_attack = null
 var current_attack = null
 var face_dir := Vector2.RIGHT
+var aim_dir := Vector2.RIGHT
+var is_aiming := false  # Nouvelle variable pour savoir si on vise
+const AIM_DEADZONE := 0.15 
 
+
+func init(player_num: int, device: int):
+	player = player_num
+	input = DeviceInput.new(device)
 
 func _ready():
 	stamina = stamina_max
 	hp = hp_max
 	anim.animation_finished.connect(_on_animation_finished)
+	staminaChanged.emit()
+	
+	# Cache le sprite d'attaque au départ
+	attack_sprite.visible = false
+	
+func _process(_d: float) -> void:
+	if input.is_action_just_pressed("leave"):
+		PlayerManager.leave(player)
 
 func _physics_process(delta):
 	_aim_update()
@@ -50,37 +76,52 @@ func _physics_process(delta):
 	if not is_attacking and not is_dodging:
 		_move_update(delta)
 	_regen_update(delta)
-	move_and_slide()
+	body.move_and_slide()
 
 func _aim_update():
-	var input_vec := Input.get_vector("move_left","move_right","move_up","move_down")
-	if input_vec.length() > 0.01:
-		face_dir = input_vec.normalized()
+	var aim_input = input.get_vector("aim_left","aim_right","aim_up","aim_down")
+	
+	# Détecte si on vise actuellement
+	is_aiming = aim_input.length() > AIM_DEADZONE
+	
+	if is_aiming:
+		aim_dir = aim_input.normalized()
+		# Flip horizontal du sprite du personnage basé sur la visée (uniquement gauche/droite)
+		if absf(aim_dir.x) > 0.1:
+			player_sprite.flip_h = aim_dir.x < 0.0
 
 func _read_combat_inputs() -> void:
-	if Input.is_action_just_pressed("attack"):
-		if current_attack == null:
-			queued_attack = attack_light
-		else:
+	# Attaque déclenchée par les touches d'aim
+	if is_aiming:
+		# Si on commence à viser, lance la première attaque
+		if not is_attacking:
+			attack(attack_light)
+		# Si on maintient la visée et qu'une attaque se termine, continue le combo
+		elif current_attack != null and queued_attack == null:
 			queued_attack = current_attack.next_attack
-		attack(queued_attack)
-		
-	if Input.is_action_just_pressed("attack_heavy"):
-		is_attacking = true
-	if Input.is_action_just_pressed("dodge"):
+	
+	# Attaque heavy (garde ton ancien système si besoin)
+	if input.is_action_just_pressed("attack_heavy"):
+		if current_attack == null:
+			attack(attack_heavy)
+		else:
+			queued_attack = attack_heavy
+	
+	# Dodge
+	if input.is_action_just_pressed("dodge"):
 		_try_dodge()
 
 func _move_update(delta):
-	var input_vec := Input.get_vector("move_left","move_right","move_up","move_down")
-	var target_vel := input_vec * move_speed
+	var input_vec = input.get_vector("move_left","move_right","move_up","move_down")
+	var target_vel = input_vec * move_speed
 
 	var accel_used := 0.0
-	if target_vel.length() > velocity.length():
+	if target_vel.length() > body.velocity.length():
 		accel_used = accel
 	else:
 		accel_used = deaccel
 
-	velocity = velocity.move_toward(target_vel, accel_used * delta)
+	body.velocity = body.velocity.move_toward(target_vel, accel_used * delta)
 	
 	if input_vec != Vector2.ZERO:
 		anim.play("run")
@@ -105,15 +146,41 @@ func attack(atk : AttackData):
 	
 	stamina -= current_attack.stamina_cost
 	staminaChanged.emit()
-	velocity = Vector2.ZERO # Idée -> rajouter une direction dans le attackdata pour faire des dash lors des attaques apr exemple
+	
+	# Détermine la direction de l'attaque
+	var attack_dir := aim_dir if(aim_dir.length() > AIM_DEADZONE) else face_dir
+	face_dir = attack_dir.normalized()
+	
+	if absf(face_dir.x) > 0.1:
+		player_sprite.flip_h = face_dir.x < 0.0
+	
+	attack_pivot.rotation = attack_dir.angle()
+	
+	attack_pivot.position = attack_dir * attack_offset
+	
+	attack_sprite.visible = true
+	
+	body.velocity = Vector2.ZERO
 	is_attacking = true
 	anim.play(current_attack.anim)
 	
 func _on_animation_finished(animName: StringName) -> void:
 	if current_attack != null and animName == StringName(current_attack.anim):
 		is_attacking = false
-		current_attack = null
-		anim.play("idle")
+		
+		# Si on maintient la visée et qu'il y a une attaque en queue, lance-la
+		if is_aiming and queued_attack != null:
+			var next_atk = queued_attack
+			queued_attack = null
+			attack(next_atk)
+		else:
+			current_attack = null
+			queued_attack = null
+			# Cache le sprite d'attaque
+			attack_sprite.visible = false
+			# Réinitialise la position du pivot
+			attack_pivot.position = Vector2.ZERO
+			anim.play("idle")
 
 # ---------------- Dodge ----------------
 func _try_dodge() -> void:
@@ -121,16 +188,24 @@ func _try_dodge() -> void:
 		return
 	if stamina < dodge_cost:
 		return
+
 	is_dodging = true
 	stamina -= dodge_cost
 	anim.play("dodge")
-	await _perform_dodge()
+
+	# priorité au déplacement (ZQSD), sinon l'orientation actuelle
+	var mv = input.get_vector("move_left","move_right","move_up","move_down")
+	var dir = mv.normalized() if(mv.length() > 0.1) else face_dir
+
+	await _perform_dodge(dir)
+
 	anim.play("idle")
 	is_dodging = false
 
-func _perform_dodge() -> void:
-	var dir := face_dir
+
+func _perform_dodge(dir: Vector2) -> void:
+	var d := dir.normalized()
 	var until := Time.get_ticks_msec() + int(dodge_duration * 1000.0)
 	while Time.get_ticks_msec() < until:
-		velocity = dir * dodge_speed
+		body.velocity = d * dodge_speed
 		await get_tree().physics_frame

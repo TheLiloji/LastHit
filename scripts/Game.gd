@@ -1,63 +1,34 @@
-extends Node2D
+extends Node
 
-# Scène du joueur (CharacterBody2D) contenant le script Player.gd
-@export var PlayerScene: PackedScene
+# map from player integer to the player node
+var player_nodes = {}
 
-# Positions de spawn (si tu n’as pas de Marker2D en scène)
-@export var default_spawns := [
-	Vector2(100, 100),
-	Vector2(200, 100),
-	Vector2(100, 200),
-	Vector2(200, 200),
-]
+func _ready():
+	PlayerManager.player_joined.connect(spawn_player)
+	PlayerManager.player_left.connect(delete_player)
 
-var device_to_player: Dictionary = {} # device_id -> Player node (device -1 = clavier)
+func _process(_delta):
+	PlayerManager.handle_join_input()
 
-func _ready() -> void:
-	print("Connected joypads at start:", Input.get_connected_joypads())
+func spawn_player(player: int):
+	# create the player node
+	var player_scene = load("res://scenes/proto.tscn")
+	var player_node = player_scene.instantiate()
+	player_nodes[player] = player_node
+	
+	# let the player know which device controls it
+	var device = PlayerManager.get_player_device(player)
+	player_node.init(player, device)
+	
+	# add the player to the tree
+	add_child(player_node)
+	
+	# random spawn position
+	player_node.position = Vector2(randf_range(0, 100), randf_range(0, 100))
 
-func _input(event: InputEvent) -> void:
-	# --- Auto-join via manette : bouton START ---
-	if event is InputEventJoypadButton and event.pressed:
-		# JOY_BUTTON_START est l’énum Godot (Start/Options/Menu selon la manette)
-		if event.button_index == JOY_BUTTON_START:
-			var dev := event.device
-			if not device_to_player.has(dev):
-				_spawn_player_for_device(dev)
-				return
+func delete_player(player: int):
+	player_nodes[player].queue_free()
+	player_nodes.erase(player)
 
-	# --- Auto-join via clavier : action "start" ---
-	if event is InputEventKey:
-		if event.is_action_pressed("start"):
-			if not device_to_player.has(-1):
-				_spawn_player_for_device(-1)
-				return
-
-func _spawn_player_for_device(device_id: int) -> void:
-	if PlayerScene == null:
-		push_error("PlayerScene n'est pas défini dans Game.gd")
-		return
-
-	var p := PlayerScene.instantiate()
-	add_child(p)
-
-	# Assigne le device au Player
-	p.call_deferred("bind_device", device_id)
-
-	# Position de spawn
-	var idx := device_to_player.size()
-	var spawn_pos := _find_spawn_position(idx)
-	p.global_position = spawn_pos
-
-	device_to_player[device_id] = p
-	print("Spawned player for device:", device_id, "at", spawn_pos)
-
-func _find_spawn_position(index: int) -> Vector2:
-	# Si tu as un Node "Spawns" avec des Marker2D -> on s’en sert
-	if has_node("Spawns"):
-		var markers := get_node("Spawns").get_children()
-		if markers.size() > 0:
-			return markers[index % markers.size()].global_position
-
-	# Sinon, fallback sur default_spawns
-	return default_spawns[index % default_spawns.size()]
+func on_player_leave(player: int):
+	PlayerManager.leave(player)

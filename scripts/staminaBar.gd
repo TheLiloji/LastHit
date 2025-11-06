@@ -1,10 +1,11 @@
 extends ProgressBar
 
-@export var player: Player
+@export var player: Node
 
 func _ready():
-	player.staminaChanged.connect(update)
-	update()
+	await player.ready
+	player.staminaChanged.connect(update_value)
+	update_value()
 
-func update():
+func update_value():
 	value = player.stamina * 100 / player.stamina_max

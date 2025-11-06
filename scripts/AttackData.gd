@@ -7,3 +7,5 @@ class_name AttackData
 @export var stamina_cost: float = 10.0
 @export var knockback: float = 160.0
 @export var next_attack: AttackData
+@export var attack_offset: float = 40.0
+@export var attack_texture: Texture2D

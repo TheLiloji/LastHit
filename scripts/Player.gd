@@ -3,6 +3,8 @@ extends Node2D
 class_name Player
 
 signal staminaChanged
+signal corruptionChanged
+signal healthChanged
 
 var player: int
 var input
@@ -22,6 +24,11 @@ var stamina
 @export var hp_max := 100
 var hp
 
+# --- Corruption ---
+@export var corruption_max := 100.0
+var corruption := 0.0
+var is_corrupted := false
+
 # --- Attaques (début de chaîne) ---
 @export var attack_light: AttackData
 @export var attack_heavy: AttackData
@@ -31,13 +38,13 @@ var hp
 @export var dodge_speed := 340.0
 @export var dodge_duration := 0.22
 
-
 # --- Réfs ---
 @onready var anim: AnimationPlayer = $PlayerBody/AnimationPlayer
-@onready var hitbox_shape: CollisionShape2D = $PlayerBody/AttackPivot/Attack/Hitbox/CollisionShape2D
+@onready var hitbox_shape: CollisionShape2D = $PlayerBody/AttackPivot/Attack/Hitbox
 @onready var attack_pivot: Node2D = $PlayerBody/AttackPivot
 @onready var attack_sprite: Sprite2D = $PlayerBody/AttackPivot/Attack/Sprite2D
 @onready var player_sprite: Sprite2D = $PlayerBody/Sprite2D
+@onready var attack_area: Area2D = $PlayerBody/AttackPivot/Attack
 
 # --- État ---
 var is_attacking := false
@@ -50,7 +57,6 @@ var aim_dir := Vector2.RIGHT
 var is_aiming := false
 const AIM_DEADZONE := 0.15 
 
-
 func init(player_num: int, device: int):
 	player = player_num
 	input = DeviceInput.new(device)
@@ -58,10 +64,19 @@ func init(player_num: int, device: int):
 func _ready():
 	stamina = stamina_max
 	hp = hp_max
+	corruption = 0.0
+	
+	add_to_group("players")
+	
 	anim.animation_finished.connect(_on_animation_finished)
 	staminaChanged.emit()
+	healthChanged.emit()
+	corruptionChanged.emit()
 
 	attack_sprite.visible = false
+	
+	if attack_area:
+		attack_area.body_entered.connect(_on_attack_hit)
 	
 func _process(_d: float) -> void:
 	if input.is_action_just_pressed("leave"):
@@ -92,14 +107,6 @@ func _read_combat_inputs() -> void:
 		elif current_attack != null and queued_attack == null:
 			queued_attack = current_attack.next_attack
 	
-	# Attaque heavy (garde ton ancien système si besoin)
-	#if input.is_action_just_pressed("attack_heavy"):
-		#if current_attack == null:
-			#attack(attack_heavy)
-		#else:
-			#queued_attack = attack_heavy
-	#
-	# Dodge
 	if input.is_action_just_pressed("dodge"):
 		_try_dodge()
 
@@ -123,8 +130,10 @@ func _move_update(delta):
 func _regen_update(delta):
 	stamina = clamp(stamina + stamina_regen * delta, 0.0, stamina_max)
 	staminaChanged.emit()
-
-# ---------------- Attaques / Combos ----------------
+	
+	if corruption > 0 and not is_corrupted:
+		corruption = max(0, corruption - 5.0 * delta)
+		corruptionChanged.emit()
 
 func attack(atk : AttackData):
 	if is_dodging:
@@ -150,13 +159,21 @@ func attack(atk : AttackData):
 	attack_sprite.texture = current_attack.attack_texture
 	attack_sprite.visible = true
 	
+	# ACTIVER LA HITBOX ICI
+	if hitbox_shape:
+		hitbox_shape.disabled = false
+	
 	body.velocity = Vector2.ZERO
 	is_attacking = true
 	anim.play(current_attack.anim)
-	
+
 func _on_animation_finished(animName: StringName) -> void:
 	if current_attack != null and animName == StringName(current_attack.anim):
 		is_attacking = false
+		
+		# DESACTIVER LA HITBOX ICI
+		if hitbox_shape:
+			hitbox_shape.disabled = true
 		
 		if is_aiming and queued_attack != null:
 			var next_atk = queued_attack
@@ -169,7 +186,19 @@ func _on_animation_finished(animName: StringName) -> void:
 			attack_pivot.position = Vector2.ZERO
 			anim.play("idle")
 
-# ---------------- Dodge ----------------
+func _on_attack_hit(collided_body):
+	if not is_attacking:
+		return
+	
+	if collided_body.has_method("take_damage"):
+		var damage = current_attack.damage if current_attack else 10.0
+		
+		collided_body.take_damage(damage, body.global_position)
+		
+		print(name + " a frappé " + collided_body.name + " pour " + str(damage) + " dégâts")
+		
+		add_corruption(3.0)
+
 func _try_dodge() -> void:
 	if is_attacking:
 		return
@@ -177,6 +206,7 @@ func _try_dodge() -> void:
 		return
 
 	is_dodging = true
+	invincible = true
 	stamina -= dodge_cost
 	anim.play("dodge")
 
@@ -187,7 +217,7 @@ func _try_dodge() -> void:
 
 	anim.play("idle")
 	is_dodging = false
-
+	invincible = false
 
 func _perform_dodge(dir: Vector2) -> void:
 	var d := dir.normalized()
@@ -195,3 +225,54 @@ func _perform_dodge(dir: Vector2) -> void:
 	while Time.get_ticks_msec() < until:
 		body.velocity = d * dodge_speed
 		await get_tree().physics_frame
+
+func take_damage(amount: float):
+	if invincible or is_dodging:
+		return
+	
+	hp -= amount
+	hp = max(0, hp)
+	healthChanged.emit()
+	
+	_hit_flash()
+	
+	if hp <= 0:
+		die()
+	
+	print(name + " a pris " + str(amount) + " dégâts. HP: " + str(hp) + "/" + str(hp_max))
+
+func _hit_flash():
+	player_sprite.modulate = Color.RED
+	await get_tree().create_timer(0.1).timeout
+	player_sprite.modulate = Color.WHITE
+
+func die():
+	print(name + " est mort")
+	#queue_free()
+	PlayerManager.leave(player)
+
+func add_corruption(amount: float):
+	corruption += amount
+	corruption = clamp(corruption, 0.0, corruption_max)
+	corruptionChanged.emit()
+	
+	print(name + " corruption: " + str(int(corruption)) + "/" + str(int(corruption_max)))
+	
+	if corruption >= corruption_max and not is_corrupted:
+		become_corrupted()
+
+func become_corrupted():
+	is_corrupted = true
+	print(name + " est maintenant CORROMPU")
+	
+	player_sprite.modulate = Color.PURPLE
+	
+	await get_tree().create_timer(10.0).timeout
+	cure_corruption()
+
+func cure_corruption():
+	is_corrupted = false
+	corruption = 0.0
+	player_sprite.modulate = Color.WHITE
+	corruptionChanged.emit()
+	print(name + " n'est plus corrompu")

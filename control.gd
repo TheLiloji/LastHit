@@ -8,13 +8,13 @@ func _ready() -> void:
 	$VBoxContainer/EXIT.pressed.connect(_on_exit_pressed)
 
 func _on_fight_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/proto.tscn")
+	get_tree().change_scene_to_file("res://scenes/game.tscn")
 
 func _on_customise_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/proto.tscn")
+	get_tree().change_scene_to_file("res://scenes/game.tscn")
 
 func _on_training_pressed() -> void:
-	get_tree().change_scene_to_file("res://scenes/proto.tscn")
+	get_tree().change_scene_to_file("res://scenes/game.tscn")
 
 func _on_options_pressed() -> void:
 	var options_menu = load("res://scenes/options_menu.tscn").instantiate()

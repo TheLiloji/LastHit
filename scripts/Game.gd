@@ -1,29 +1,32 @@
 extends Node
 
-# map from player integer to the player node
 var player_nodes = {}
 
 func _ready():
 	PlayerManager.player_joined.connect(spawn_player)
 	PlayerManager.player_left.connect(delete_player)
+	
+	spawn_boss()
 
 func _process(_delta):
 	PlayerManager.handle_join_input()
 
+func spawn_boss():
+	var boss_scene = load("res://scenes/boss/kraken_boss.tscn")
+	var boss_node = boss_scene.instantiate()
+	add_child(boss_node)
+	boss_node.position = Vector2(500, 300)
+
 func spawn_player(player: int):
-	# create the player node
 	var player_scene = load("res://scenes/proto.tscn")
 	var player_node = player_scene.instantiate()
 	player_nodes[player] = player_node
 	
-	# let the player know which device controls it
 	var device = PlayerManager.get_player_device(player)
 	player_node.init(player, device)
 	
-	# add the player to the tree
 	add_child(player_node)
 	
-	# random spawn position
 	player_node.position = Vector2(randf_range(0, 100), randf_range(0, 100))
 
 func delete_player(player: int):

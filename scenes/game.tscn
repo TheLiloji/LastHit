@@ -3,7 +3,7 @@
 [ext_resource type="Script" uid="uid://bcu3yko51ydlx" path="res://scripts/Game.gd" id="1_uwrxv"]
 [ext_resource type="Script" uid="uid://6curfvq5mhdx" path="res://scripts/PlayerManager.gd" id="2_yqjtg"]
 
-[node name="Game" type="Node"]
+[node name="Game" type="Node2D"]
 script = ExtResource("1_uwrxv")
 
 [node name="Node" type="Node" parent="."]

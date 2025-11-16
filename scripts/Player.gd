@@ -28,6 +28,7 @@ var hp
 @export var corruption_max := 100.0
 var corruption := 0.0
 var is_corrupted := false
+@export var corruption_duration := 15.0
 
 # --- Attaques (début de chaîne) ---
 @export var attack_light: AttackData
@@ -159,7 +160,6 @@ func attack(atk : AttackData):
 	attack_sprite.texture = current_attack.attack_texture
 	attack_sprite.visible = true
 	
-	# ACTIVER LA HITBOX ICI
 	if hitbox_shape:
 		hitbox_shape.disabled = false
 	
@@ -167,11 +167,32 @@ func attack(atk : AttackData):
 	is_attacking = true
 	anim.play(current_attack.anim)
 
+func _on_attack_hit(collided_body):
+	if not is_attacking:
+		return
+	
+	if is_corrupted:
+		var target = collided_body
+		if collided_body.get_parent() and collided_body.get_parent().is_in_group("players"):
+			target = collided_body.get_parent()
+		
+		if target.is_in_group("players") and target != self:
+			if target.has_method("take_damage"):
+				var damage = current_attack.damage if current_attack else 10.0
+				target.take_damage(damage)
+				print(name + " CORROMPU a frappé " + target.name)
+		return
+	
+	if collided_body.has_method("take_damage"):
+		var damage = current_attack.damage if current_attack else 10.0
+		collided_body.take_damage(damage, body.global_position)
+		print(name + " a frappé " + collided_body.name + " pour " + str(damage) + " dégâts")
+		add_corruption(0.5)
+
 func _on_animation_finished(animName: StringName) -> void:
 	if current_attack != null and animName == StringName(current_attack.anim):
 		is_attacking = false
 		
-		# DESACTIVER LA HITBOX ICI
 		if hitbox_shape:
 			hitbox_shape.disabled = true
 		
@@ -185,19 +206,6 @@ func _on_animation_finished(animName: StringName) -> void:
 			attack_sprite.visible = false
 			attack_pivot.position = Vector2.ZERO
 			anim.play("idle")
-
-func _on_attack_hit(collided_body):
-	if not is_attacking:
-		return
-	
-	if collided_body.has_method("take_damage"):
-		var damage = current_attack.damage if current_attack else 10.0
-		
-		collided_body.take_damage(damage, body.global_position)
-		
-		print(name + " a frappé " + collided_body.name + " pour " + str(damage) + " dégâts")
-		
-		add_corruption(3.0)
 
 func _try_dodge() -> void:
 	if is_attacking:
@@ -227,7 +235,7 @@ func _perform_dodge(dir: Vector2) -> void:
 		await get_tree().physics_frame
 
 func take_damage(amount: float):
-	if invincible or is_dodging:
+	if invincible or is_dodging or is_corrupted:
 		return
 	
 	hp -= amount
@@ -244,14 +252,19 @@ func take_damage(amount: float):
 func _hit_flash():
 	player_sprite.modulate = Color.RED
 	await get_tree().create_timer(0.1).timeout
-	player_sprite.modulate = Color.WHITE
+	if not is_corrupted:
+		player_sprite.modulate = Color.WHITE
+	else:
+		player_sprite.modulate = Color.PURPLE
 
 func die():
 	print(name + " est mort")
-	#queue_free()
 	PlayerManager.leave(player)
 
 func add_corruption(amount: float):
+	if is_corrupted:
+		return
+	
 	corruption += amount
 	corruption = clamp(corruption, 0.0, corruption_max)
 	corruptionChanged.emit()
@@ -263,11 +276,14 @@ func add_corruption(amount: float):
 
 func become_corrupted():
 	is_corrupted = true
-	print(name + " est maintenant CORROMPU")
+	print(name + " est maintenant CORROMPU - PvP activé pour " + str(corruption_duration) + " secondes")
 	
 	player_sprite.modulate = Color.PURPLE
 	
-	await get_tree().create_timer(10.0).timeout
+	remove_from_group("players")
+	add_to_group("corrupted_players")
+	
+	await get_tree().create_timer(corruption_duration).timeout
 	cure_corruption()
 
 func cure_corruption():
@@ -275,4 +291,8 @@ func cure_corruption():
 	corruption = 0.0
 	player_sprite.modulate = Color.WHITE
 	corruptionChanged.emit()
+	
+	remove_from_group("corrupted_players")
+	add_to_group("players")
+	
 	print(name + " n'est plus corrompu")

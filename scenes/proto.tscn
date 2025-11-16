@@ -461,10 +461,20 @@ size = Vector2(15, 32)
 
 [node name="Player" type="Node2D"]
 script = ExtResource("1_3iihw")
+move_speed = null
+accel = null
+deaccel = null
+stamina_max = null
+stamina_regen = null
+hp_max = null
+corruption_max = null
+corruption_duration = null
 attack_light = ExtResource("2_a2wk3")
+dodge_cost = null
+dodge_speed = null
+dodge_duration = null
 
 [node name="PlayerBody" type="CharacterBody2D" parent="."]
-position = Vector2(597, 321)
 collision_mask = 10
 
 [node name="Sprite2D" type="Sprite2D" parent="PlayerBody"]

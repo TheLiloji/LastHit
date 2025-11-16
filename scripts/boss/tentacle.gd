@@ -78,6 +78,9 @@ func get_nearest_player_position() -> Vector2:
 	for player in players:
 		if not is_instance_valid(player):
 			continue
+		
+		if player.is_corrupted:
+			continue
 			
 		var player_body = player.get_node_or_null("PlayerBody")
 		if player_body == null:

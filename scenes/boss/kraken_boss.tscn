@@ -1,8 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://bdoxawff4dexe"]
+[gd_scene load_steps=7 format=3 uid="uid://bdoxawff4dexe"]
 
 [ext_resource type="Script" uid="uid://x50why3rt30c" path="res://scripts/boss/kraken_boss.gd" id="1_qkk6w"]
-[ext_resource type="PackedScene" uid="uid://thwmpbow7nyx" path="res://scenes/boss/tentacle.tscn" id="2_5w5w1"]
-[ext_resource type="PackedScene" uid="uid://lnh25hu4rg8m" path="res://effects/corruption_orb.tscn" id="3_0wg5g"]
+[ext_resource type="PackedScene" uid="uid://cswurjf13qfox" path="res://effects/corruption_orb.tscn" id="3_5w5w1"]
 [ext_resource type="Texture2D" uid="uid://b7oedsjv7q1bq" path="res://ressources/tête.png" id="4_5w5w1"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_qkk6w"]
@@ -26,8 +25,7 @@ height = 262.0
 collision_layer = 2
 collision_mask = 0
 script = ExtResource("1_qkk6w")
-tentacle_scene = ExtResource("2_5w5w1")
-corruption_orb_scene = ExtResource("3_0wg5g")
+corruption_orb_scene = ExtResource("3_5w5w1")
 
 [node name="Panel2" type="Panel" parent="."]
 custom_minimum_size = Vector2(375, 375)

@@ -1,6 +1,6 @@
-[gd_scene load_steps=4 format=3 uid="uid://lnh25hu4rg8m"]
+[gd_scene load_steps=4 format=3 uid="uid://cswurjf13qfox"]
 
-[ext_resource type="Script" uid="uid://dvliw7ir8rm6y" path="res://scripts/effects/corruption_orb.gd" id="1_fj20n"]
+[ext_resource type="Script" uid="uid://dvliw7ir8rm6y" path="res://scripts/effects/corruption_orb.gd" id="1_f0okw"]
 
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_6xg8w"]
 bg_color = Color(0.6156863, 0.30588236, 0.8666667, 1)
@@ -10,11 +10,11 @@ corner_radius_bottom_right = 25
 corner_radius_bottom_left = 25
 
 [sub_resource type="CircleShape2D" id="CircleShape2D_d3ww2"]
-radius = 20.0
+radius = 20.024984
 
 [node name="corruption_orb" type="Area2D"]
 collision_layer = 0
-script = ExtResource("1_fj20n")
+script = ExtResource("1_f0okw")
 
 [node name="Visual" type="Panel" parent="."]
 offset_right = 40.0

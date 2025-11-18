@@ -17,15 +17,15 @@ var input
 @export var deaccel := 2200.0
 
 # --- Stamina / HP ---
-@export var stamina_max := 100.0
-@export var stamina_regen := 18.0
+@export var stamina_max := 160.0
+@export var stamina_regen := 20.0
 var stamina
 
 @export var hp_max := 100
 var hp
 
 # --- Corruption ---
-@export var corruption_max := 100.0
+@export var corruption_max := 2000.0
 var corruption := 0.0
 var is_corrupted := false
 @export var corruption_duration := 15.0
